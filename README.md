@@ -13,7 +13,7 @@ Multiplayer Catalyst is a plugin for Unreal Engine 5 meant for multiplayer games
 - Functions to easily access game settings and control the game
 
 ## Getting Started
-Learn how to start using Multiplayer Catalyst in your game [here](https://github.com/msilva2203/MultiplayerCatalyst/wiki).
+Visit the [Multiplayer Catalyst Wiki](https://github.com/msilva2203/MultiplayerCatalyst/wiki) to learn how to start using the Multiplayer Catalyst plugin in your game.
 
 ## Requirements
 - **Unreal Engine 5.0.3 or later**
