@@ -20,7 +20,7 @@ void UActorAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UActorAttributeComponent, Actor, AttributeReplicationCondition);
+	DOREPLIFETIME(UActorAttributeComponent, Actor)
 	DOREPLIFETIME(UActorAttributeComponent, bLocked);
 }
 

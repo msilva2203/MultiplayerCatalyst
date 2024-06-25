@@ -25,7 +25,8 @@ void UIntegerAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UIntegerAttributeComponent, AttributeValue, AttributeReplicationCondition);
+	//DOREPLIFETIME_CONDITION(UIntegerAttributeComponent, AttributeValue, AttributeReplicationCondition);
+	DOREPLIFETIME(UIntegerAttributeComponent, AttributeValue)
 	DOREPLIFETIME(UIntegerAttributeComponent, bLocked)
 }
 

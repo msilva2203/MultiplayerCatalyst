@@ -22,7 +22,7 @@ void UBoolAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UBoolAttributeComponent, AttributeValue, AttributeReplicationCondition);
+	DOREPLIFETIME(UBoolAttributeComponent, AttributeValue);
 	DOREPLIFETIME(UBoolAttributeComponent, bLocked);
 }
 

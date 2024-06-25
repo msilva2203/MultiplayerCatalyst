@@ -25,7 +25,8 @@ void UScalarAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UScalarAttributeComponent, AttributeValue, AttributeReplicationCondition);
+	//DOREPLIFETIME_CONDITION(UScalarAttributeComponent, AttributeValue, AttributeReplicationCondition);
+	DOREPLIFETIME(UScalarAttributeComponent, AttributeValue)
 	DOREPLIFETIME(UScalarAttributeComponent, bLocked)
 }
 

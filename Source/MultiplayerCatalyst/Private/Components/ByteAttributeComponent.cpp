@@ -29,7 +29,7 @@ void UByteAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UByteAttributeComponent, AttributeValue, AttributeReplicationCondition);
+	DOREPLIFETIME(UByteAttributeComponent, AttributeValue);
 	DOREPLIFETIME(UByteAttributeComponent, bLocked)
 }
 
