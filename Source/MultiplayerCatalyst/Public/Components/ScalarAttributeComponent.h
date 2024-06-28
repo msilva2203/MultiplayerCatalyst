@@ -7,6 +7,7 @@
 #include "ScalarAttributeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnScalarAttributeValueChanged, float, NewValue, float, Previous);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnScalarAttributeDelegate, float, Overflow);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnScalarAttributeLocked);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnScalarAttributeUnlocked);
 
@@ -32,10 +33,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
-	void SetAttributeValue(float NewValue, bool bForceReplication = false);
+	void SetAttributeValue(float& UpdatedValue, float& Overflow, float NewValue, bool bForceReplication = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
-	void OffsetAttributeValue(float Offset);
+	void OffsetAttributeValue(float& UpdatedValue, float& Overflow, float Offset);
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
 	void ResetAttribute();
@@ -58,6 +59,15 @@ public:
 	FOnScalarAttributeValueChanged OnScalarAttributeValueChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FOnScalarAttributeDelegate OnMaxValueReached;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FOnScalarAttributeDelegate OnMinValueReached;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FOnScalarAttributeDelegate OnOverflow;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FOnScalarAttributeLocked OnScalarAttributeLocked;
 
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
@@ -74,6 +84,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
 	float MaxValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
+	bool bUseMinValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
+	bool bUseMaxValue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
 	TEnumAsByte<ELifetimeCondition> AttributeReplicationCondition;

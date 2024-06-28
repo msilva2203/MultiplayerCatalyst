@@ -10,6 +10,8 @@ UScalarAttributeComponent::UScalarAttributeComponent() :
 	DefaultValue(100.0f),
 	MinValue(0.0f),
 	MaxValue(100.0f),
+	bUseMinValue(false),
+	bUseMaxValue(false),
 	AttributeReplicationCondition(COND_None),
 	bStartLocked(false)
 {
@@ -56,11 +58,37 @@ void UScalarAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
-void UScalarAttributeComponent::SetAttributeValue(float NewValue, bool bForceReplication)
+void UScalarAttributeComponent::SetAttributeValue(float& UpdatedValue, float& Overflow, float NewValue, bool bForceReplication)
 {
+	Overflow = 0;
+
 	if (!IsLocked())
 	{
-		NewValue = FMath::Clamp<float>(NewValue, MinValue, MaxValue);
+		// Clamp with min value
+		if (bUseMinValue)
+		{
+			if (NewValue <= MinValue)
+			{
+				Overflow = NewValue - MinValue;
+				NewValue = MinValue;
+
+				OnMinValueReached.Broadcast(Overflow);
+				OnOverflow.Broadcast(Overflow);
+			}
+		}
+
+		// Clamp with max value
+		if (bUseMaxValue)
+		{
+			if (NewValue >= MaxValue)
+			{
+				Overflow = NewValue - MaxValue;
+				NewValue = MaxValue;
+
+				OnMaxValueReached.Broadcast(Overflow);
+				OnOverflow.Broadcast(Overflow);
+			}
+		}
 
 		if (AttributeValue != NewValue)
 		{
@@ -74,16 +102,19 @@ void UScalarAttributeComponent::SetAttributeValue(float NewValue, bool bForceRep
 			}
 		}
 	}
+
+	UpdatedValue = AttributeValue;
 }
 
-void UScalarAttributeComponent::OffsetAttributeValue(float Offset)
+void UScalarAttributeComponent::OffsetAttributeValue(float& UpdatedValue, float& Overflow, float Offset)
 {
-	SetAttributeValue(AttributeValue + Offset);
+	SetAttributeValue(UpdatedValue, Overflow, AttributeValue + Offset);
 }
 
 void UScalarAttributeComponent::ResetAttribute()
 {
-	SetAttributeValue(DefaultValue);
+	float A, B;
+	SetAttributeValue(A, B, DefaultValue);
 }
 
 void UScalarAttributeComponent::SetLock(bool bNewValue)
@@ -111,7 +142,8 @@ bool UScalarAttributeComponent::IsLocked() const
 
 void UScalarAttributeComponent::Server_SetAttributeValue_Implementation(float NewValue)
 {
-	SetAttributeValue(NewValue);
+	float A, B;
+	SetAttributeValue(A, B, NewValue);
 }
 
 bool UScalarAttributeComponent::Server_SetAttributeValue_Validate(float NewValue)
@@ -121,8 +153,9 @@ bool UScalarAttributeComponent::Server_SetAttributeValue_Validate(float NewValue
 
 void UScalarAttributeComponent::NetAll_SetAttributeValue_Implementation(float NewValue)
 {
+	float A, B;
 	if (!GetOwner()->HasAuthority())
-		SetAttributeValue(NewValue);
+		SetAttributeValue(A, B, NewValue);
 }
 
 void UScalarAttributeComponent::OnRep_AttributeValue()

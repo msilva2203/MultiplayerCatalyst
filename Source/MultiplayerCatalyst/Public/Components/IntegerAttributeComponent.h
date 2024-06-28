@@ -7,6 +7,7 @@
 #include "IntegerAttributeComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnIntegerAttributeValueChanged, int32, NewValue, int32, Previous);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnIntegerAttributeDelegate, int32, Overflow);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIntegerAttributeLocked);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIntegerAttributeUnlocked);
 
@@ -32,10 +33,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
-	void SetAttributeValue(int32 NewValue, bool bForceReplication = false);
+	void SetAttributeValue(int32& UpdatedValue, int32& Overflow, int32 NewValue, bool bForceReplication = false);
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
-	void OffsetAttributeValue(int32 Offset);
+	void OffsetAttributeValue(int32& UpdatedValue, int32& Overflow, int32 Offset);
 
 	UFUNCTION(BlueprintCallable, Category = "Attribute")
 	void ResetAttribute();
@@ -58,6 +59,15 @@ public:
 	FOnIntegerAttributeValueChanged OnIntegerAttributeValueChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FOnIntegerAttributeDelegate OnMaxValueReached;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FOnIntegerAttributeDelegate OnMinValueReached;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
+	FOnIntegerAttributeDelegate OnOverflow;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attribute")
 	FOnIntegerAttributeLocked OnIntegerAttributeLocked;
 
 	UPROPERTY(BlueprintAssignable, Category = "Attribute")
@@ -74,6 +84,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
 	int32 MaxValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
+	bool bUseMinValue;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
+	bool bUseMaxValue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
 	TEnumAsByte<ELifetimeCondition> AttributeReplicationCondition;

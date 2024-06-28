@@ -10,6 +10,8 @@ UIntegerAttributeComponent::UIntegerAttributeComponent() :
 	DefaultValue(0),
 	MinValue(0),
 	MaxValue(100),
+	bUseMinValue(false),
+	bUseMaxValue(false),
 	AttributeReplicationCondition(COND_None),
 	bStartLocked(false)
 {
@@ -56,11 +58,37 @@ void UIntegerAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	// ...
 }
 
-void UIntegerAttributeComponent::SetAttributeValue(int32 NewValue, bool bForceReplication)
+void UIntegerAttributeComponent::SetAttributeValue(int32& UpdatedValue, int32& Overflow, int32 NewValue, bool bForceReplication)
 {
+	Overflow = 0;
+
 	if (!IsLocked())
 	{
-		NewValue = FMath::Clamp<int32>(NewValue, MinValue, MaxValue);
+		// Clamp with min value
+		if (bUseMinValue)
+		{
+			if (NewValue <= MinValue)
+			{
+				Overflow = NewValue - MinValue;
+				NewValue = MinValue;
+
+				OnMinValueReached.Broadcast(Overflow);
+				OnOverflow.Broadcast(Overflow);
+			}
+		}
+
+		// Clamp with max value
+		if (bUseMaxValue)
+		{
+			if (NewValue >= MaxValue)
+			{
+				Overflow = NewValue - MaxValue;
+				NewValue = MaxValue;
+
+				OnMaxValueReached.Broadcast(Overflow);
+				OnOverflow.Broadcast(Overflow);
+			}
+		}
 
 		if (AttributeValue != NewValue)
 		{
@@ -74,16 +102,19 @@ void UIntegerAttributeComponent::SetAttributeValue(int32 NewValue, bool bForceRe
 			}
 		}
 	}
+
+	UpdatedValue = AttributeValue;
 }
 
-void UIntegerAttributeComponent::OffsetAttributeValue(int32 Offset)
+void UIntegerAttributeComponent::OffsetAttributeValue(int32& UpdatedValue, int32& Overflow, int32 Offset)
 {
-	SetAttributeValue(AttributeValue + Offset);
+	SetAttributeValue(UpdatedValue, Overflow, AttributeValue + Offset);
 }
 
 void UIntegerAttributeComponent::ResetAttribute()
 {
-	SetAttributeValue(DefaultValue);
+	int32 A, B;
+	SetAttributeValue(A, B, DefaultValue);
 }
 
 void UIntegerAttributeComponent::SetLock(bool bNewValue)
@@ -111,7 +142,8 @@ bool UIntegerAttributeComponent::IsLocked() const
 
 void UIntegerAttributeComponent::Server_SetAttributeValue_Implementation(int32 NewValue)
 {
-	SetAttributeValue(NewValue);
+	int32 A, B;
+	SetAttributeValue(A, B, NewValue);
 }
 
 bool UIntegerAttributeComponent::Server_SetAttributeValue_Validate(int32 NewValue)
@@ -121,8 +153,9 @@ bool UIntegerAttributeComponent::Server_SetAttributeValue_Validate(int32 NewValu
 
 void UIntegerAttributeComponent::NetAll_SetAttributeValue_Implementation(int32 NewValue)
 {
+	int32 A, B;
 	if (!GetOwner()->HasAuthority())
-		SetAttributeValue(NewValue);
+		SetAttributeValue(A, B, NewValue);
 }
 
 void UIntegerAttributeComponent::OnRep_AttributeValue()
