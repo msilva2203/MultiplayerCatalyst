@@ -45,6 +45,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Game Mode Catalyst")
 	void OnStartPlayers();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Game Mode Catalyst")
+	void OnPlayerSpawned(APlayerControllerCatalyst* PlayerSpawned);
+
+public:
+	UFUNCTION(BlueprintNativeEvent, Category = "Game Mode Catalyst")
+	bool CanSpawnPlayer(APlayerControllerCatalyst* Player);
+	virtual bool CanSpawnPlayer_Implementation(APlayerControllerCatalyst* Player);
+
 public:
 	UFUNCTION(BlueprintPure, Category = "Game Mode Catalyst")
 	int32 GetTeamSize(uint8 Team);
@@ -92,6 +100,8 @@ protected:
 	virtual void LoginNewPlayer(APlayerControllerCatalyst* NewPlayer);
 	virtual void StartNewPlayer(APlayerControllerCatalyst* NewPlayer);
 	virtual void LogoutPlayer(APlayerControllerCatalyst* Exiting);
+
+	virtual void PlayerSpawned(APlayerControllerCatalyst* SpawnedPlayer);
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Players");

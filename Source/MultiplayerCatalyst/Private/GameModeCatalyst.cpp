@@ -26,6 +26,11 @@ AGameModeCatalyst::AGameModeCatalyst()
 	AttributeMap = CreateDefaultSubobject<UAttributeMapComponent>(TEXT("Attribute Map"));
 }
 
+bool AGameModeCatalyst::CanSpawnPlayer_Implementation(APlayerControllerCatalyst* Player)
+{
+	return true;
+}
+
 int32 AGameModeCatalyst::GetTeamSize(uint8 Team)
 {
 	int32 Size = 0;
@@ -134,13 +139,16 @@ void AGameModeCatalyst::StartPlayers()
 
 void AGameModeCatalyst::SpawnPlayer(APlayerControllerCatalyst* Player, bool bStarterSpawner)
 {
-	if (Player)
+	if (Player && CanSpawnPlayer(Player))
 	{
 		uint8 PlayerTeam = UCatalystStatics::GetActorTeam(Player);
 		auto Spawner = FindAvailableSpawner(PlayerTeam, bStarterSpawner);
 
 		if (Spawner)
+		{
 			Spawner->SpawnPlayer(Player);
+			PlayerSpawned(Player);
+		}
 	}
 }
 
@@ -251,6 +259,13 @@ void AGameModeCatalyst::StartNewPlayer(APlayerControllerCatalyst* NewPlayer)
 void AGameModeCatalyst::LogoutPlayer(APlayerControllerCatalyst* Exiting)
 {
 	OnLogoutPlayer(Exiting);
+
+}
+
+void AGameModeCatalyst::PlayerSpawned(APlayerControllerCatalyst* SpawnedPlayer)
+{
+	OnPlayerSpawned(SpawnedPlayer);
+
 }
 
 void AGameModeCatalyst::gm_start()
