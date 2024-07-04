@@ -29,17 +29,21 @@ void APlayerStateCatalyst::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SessionSubsystem = GetWorld()->GetSubsystem<USessionCatalystSubsystem>();
+	if (!SessionSubsystem)
+	{
+		SessionSubsystem = GetWorld()->GetSubsystem<USessionCatalystSubsystem>();
+	}
 }
 
 void APlayerStateCatalyst::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (SessionSubsystem)
+	if (!SessionSubsystem)
 	{
-		SessionSubsystem->RemovePlayer(this);
+		SessionSubsystem = GetWorld()->GetSubsystem<USessionCatalystSubsystem>();
 	}
+	SessionSubsystem->RemovePlayer(this);
 }
 
 void APlayerStateCatalyst::CopyProperties(APlayerState* PlayerState)
@@ -65,10 +69,13 @@ uint8 APlayerStateCatalyst::GetTeam()
 
 void APlayerStateCatalyst::OnRep_PlayerName()
 {
-	if (SessionSubsystem)
+	Super::OnRep_PlayerName();
+
+	if (!SessionSubsystem)
 	{
-		SessionSubsystem->AddPlayer(this);
+		SessionSubsystem = GetWorld()->GetSubsystem<USessionCatalystSubsystem>();
 	}
+	SessionSubsystem->AddPlayer(this);
 }
 
 void APlayerStateCatalyst::ps_set_player_team(uint8 new_team)
