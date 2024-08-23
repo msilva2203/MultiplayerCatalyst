@@ -6,7 +6,12 @@
 #include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
-UBoolAttributeComponent::UBoolAttributeComponent()
+UBoolAttributeComponent::UBoolAttributeComponent() :
+	DefaultValue(false),
+	bAllowReplicationByPlayers(true),
+	bUseMulticasting(false),
+	AttributeReplicationCondition(COND_None),
+	bStartLocked(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -51,13 +56,12 @@ void UBoolAttributeComponent::SetAttributeValue(bool NewValue, bool bForceReplic
 		if (AttributeValue != NewValue)
 		{
 			AttributeValue = NewValue;
+			if (bForceReplication && bAllowReplicationByPlayers && !(GetOwner()->HasAuthority()))
+			{
+				Server_SetAttributeValue(AttributeValue);
+			}
 			GetOwner()->ForceNetUpdate();
 			OnRep_AttributeValue();
-
-			if (bForceReplication)
-			{
-				NetAll_SetAttributeValue(AttributeValue);
-			}
 		}
 	}
 }
@@ -92,11 +96,16 @@ bool UBoolAttributeComponent::IsLocked() const
 
 void UBoolAttributeComponent::Server_SetAttributeValue_Implementation(bool NewValue)
 {
+	SetAttributeValue(NewValue, false);
+	if (bUseMulticasting)
+	{
+		NetAll_SetAttributeValue(NewValue);
+	}
 }
 
 bool UBoolAttributeComponent::Server_SetAttributeValue_Validate(bool NewValue)
 {
-	return false;
+	return true;
 }
 
 void UBoolAttributeComponent::NetAll_SetAttributeValue_Implementation(bool NewValue)

@@ -91,6 +91,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
 	bool bUseMaxValue;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
+	bool bAllowReplicationByPlayers;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attribute")
+	bool bUseMulticasting;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
 	TEnumAsByte<ELifetimeCondition> AttributeReplicationCondition;
 

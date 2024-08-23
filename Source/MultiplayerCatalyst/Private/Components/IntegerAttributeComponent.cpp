@@ -12,6 +12,8 @@ UIntegerAttributeComponent::UIntegerAttributeComponent() :
 	MaxValue(100),
 	bUseMinValue(false),
 	bUseMaxValue(false),
+	bAllowReplicationByPlayers(true),
+	bUseMulticasting(false),
 	AttributeReplicationCondition(COND_None),
 	bStartLocked(false)
 {
@@ -93,13 +95,12 @@ void UIntegerAttributeComponent::SetAttributeValue(int32& UpdatedValue, int32& O
 		if (AttributeValue != NewValue)
 		{
 			AttributeValue = NewValue;
+			if (bForceReplication && bAllowReplicationByPlayers && !(GetOwner()->HasAuthority()))
+			{
+				Server_SetAttributeValue(AttributeValue);
+			}
 			GetOwner()->ForceNetUpdate();
 			OnRep_AttributeValue();
-
-			if (bForceReplication)
-			{
-				NetAll_SetAttributeValue(AttributeValue);
-			}
 		}
 	}
 
@@ -144,6 +145,10 @@ void UIntegerAttributeComponent::Server_SetAttributeValue_Implementation(int32 N
 {
 	int32 A, B;
 	SetAttributeValue(A, B, NewValue);
+	if (bUseMulticasting)
+	{
+		NetAll_SetAttributeValue(NewValue);
+	}
 }
 
 bool UIntegerAttributeComponent::Server_SetAttributeValue_Validate(int32 NewValue)

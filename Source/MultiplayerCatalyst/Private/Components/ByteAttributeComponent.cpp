@@ -10,6 +10,8 @@ UByteAttributeComponent::UByteAttributeComponent() :
 	DefaultValue(0),
 	MinValue(0),
 	MaxValue(255),
+	bAllowReplicationByPlayers(true),
+	bUseMulticasting(false),
 	AttributeReplicationCondition(COND_None),
 	bStartLocked(false)
 {
@@ -61,13 +63,12 @@ void UByteAttributeComponent::SetAttributeValue(uint8 NewValue, bool bForceRepli
 		if (AttributeValue != NewValue)
 		{
 			AttributeValue = NewValue;
+			if (bForceReplication && bAllowReplicationByPlayers && !(GetOwner()->HasAuthority()))
+			{
+				Server_SetAttributeValue(AttributeValue);
+			}
 			GetOwner()->ForceNetUpdate();
 			OnRep_AttributeValue();
-
-			if (bForceReplication)
-			{
-				NetAll_SetAttributeValue(AttributeValue);
-			}
 		}
 	}
 }
@@ -108,6 +109,10 @@ bool UByteAttributeComponent::IsLocked() const
 void UByteAttributeComponent::Server_SetAttributeValue_Implementation(uint8 NewValue)
 {
 	SetAttributeValue(NewValue);
+	if (bUseMulticasting)
+	{
+		NetAll_SetAttributeValue(NewValue);
+	}
 }
 
 bool UByteAttributeComponent::Server_SetAttributeValue_Validate(uint8 NewValue)

@@ -12,6 +12,8 @@ UScalarAttributeComponent::UScalarAttributeComponent() :
 	MaxValue(100.0f),
 	bUseMinValue(false),
 	bUseMaxValue(false),
+	bAllowReplicationByPlayers(true),
+	bUseMulticasting(false),
 	AttributeReplicationCondition(COND_None),
 	bStartLocked(false)
 {
@@ -93,13 +95,12 @@ void UScalarAttributeComponent::SetAttributeValue(float& UpdatedValue, float& Ov
 		if (AttributeValue != NewValue)
 		{
 			AttributeValue = NewValue;
+			if (bForceReplication && bAllowReplicationByPlayers && !(GetOwner()->HasAuthority()))
+			{
+				Server_SetAttributeValue(AttributeValue);
+			}
 			GetOwner()->ForceNetUpdate();
 			OnRep_AttributeValue();
-
-			if (bForceReplication)
-			{
-				NetAll_SetAttributeValue(AttributeValue);
-			}
 		}
 	}
 
@@ -144,6 +145,10 @@ void UScalarAttributeComponent::Server_SetAttributeValue_Implementation(float Ne
 {
 	float A, B;
 	SetAttributeValue(A, B, NewValue);
+	if (bUseMulticasting)
+	{
+		NetAll_SetAttributeValue(NewValue);
+	}
 }
 
 bool UScalarAttributeComponent::Server_SetAttributeValue_Validate(float NewValue)
