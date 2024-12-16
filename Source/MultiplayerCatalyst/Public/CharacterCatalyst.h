@@ -35,6 +35,9 @@ public:
 	UPROPERTY()
 	UAttributeMapComponent* AttributeMap;
 
+	UPROPERTY()
+	bool bCompletedSetup;
+
 private:
 	
 };

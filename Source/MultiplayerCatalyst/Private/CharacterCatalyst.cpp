@@ -7,7 +7,8 @@
 #include "Statics/CatalystStatics.h"
 #include "GameFramework/PlayerState.h"
 
-ACharacterCatalyst::ACharacterCatalyst()
+ACharacterCatalyst::ACharacterCatalyst() :
+	bCompletedSetup(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -27,6 +28,7 @@ void ACharacterCatalyst::BeginPlay()
 
 void ACharacterCatalyst::SetupCharacter()
 {
+	bCompletedSetup = true;
 	OnSetupCharacter();
 }
 
@@ -34,7 +36,10 @@ void ACharacterCatalyst::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	SetupCharacter();
+	if (GetPlayerState())
+	{
+		SetupCharacter();
+	}
 }
 
 uint8 ACharacterCatalyst::GetTeam()
@@ -45,6 +50,11 @@ uint8 ACharacterCatalyst::GetTeam()
 void ACharacterCatalyst::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!bCompletedSetup && GetPlayerState())
+	{
+		SetupCharacter();
+	}
 }
 
 void ACharacterCatalyst::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
