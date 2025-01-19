@@ -23,11 +23,17 @@ public:
 	UFUNCTION()
 	virtual void NativeSetupNewPawn(APlayerControllerCatalyst* Player, APawn* NewPawn);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Player Spawner")
+	UFUNCTION(BlueprintNativeEvent, Category = "Player Spawner")
 	void SetupNewPawn(APlayerControllerCatalyst* Player, APawn* NewPawn);
+	virtual void SetupNewPawn_Implementation(APlayerControllerCatalyst* Player, APawn* NewPawn);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Player Spawner")
+	UFUNCTION(BlueprintNativeEvent, Category = "Player Spawner")
 	void OnPlayerSpawned(APlayerControllerCatalyst* Player, APawn* NewPawn);
+	virtual void OnPlayerSpawned_Implementation(APlayerControllerCatalyst* Player, APawn* NewPawn);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Game Mode Catalyst")
+	bool IsAvailable();
+	virtual bool IsAvailable_Implementation();
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Player Spawner")

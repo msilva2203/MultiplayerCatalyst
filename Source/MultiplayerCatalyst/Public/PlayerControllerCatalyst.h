@@ -9,6 +9,8 @@
 
 class UAttributeMapComponent;
 
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUnPossessSignature, APawn*, UnpossessedPawn)
+
 /**
  * 
  */
@@ -23,9 +25,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Player Controller Catalyst")
 	void OnSetupPlayerController();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Player Controller Catalyst")
+	void OnReceivedPlayer();
+
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void ReceivedPlayer() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 

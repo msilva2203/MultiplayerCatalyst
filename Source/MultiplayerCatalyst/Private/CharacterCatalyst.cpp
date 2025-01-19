@@ -6,6 +6,7 @@
 #include "Components/AttributeMapComponent.h"
 #include "Statics/CatalystStatics.h"
 #include "GameFramework/PlayerState.h"
+#include "Net/UnrealNetwork.h"
 
 ACharacterCatalyst::ACharacterCatalyst() :
 	bCompletedSetup(false)
@@ -14,6 +15,13 @@ ACharacterCatalyst::ACharacterCatalyst() :
 	PrimaryActorTick.bCanEverTick = true;
 
 	AttributeMap = CreateDefaultSubobject<UAttributeMapComponent>(TEXT("Attribute Map"));
+}
+
+void ACharacterCatalyst::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//DOREPLIFETIME(ACharacterCatalyst, ControlRotationPitch)
 }
 
 void ACharacterCatalyst::BeginPlay()
@@ -26,10 +34,21 @@ void ACharacterCatalyst::BeginPlay()
 	}
 }
 
+void ACharacterCatalyst::NotifyControllerChanged()
+{
+	Super::NotifyControllerChanged();
+
+	SetupCharacterController(PreviousController, Controller);
+}
+
 void ACharacterCatalyst::SetupCharacter()
 {
 	bCompletedSetup = true;
 	OnSetupCharacter();
+}
+
+void ACharacterCatalyst::SetupCharacterController(AController* OldController, AController* NewController)
+{
 }
 
 void ACharacterCatalyst::OnRep_PlayerState()

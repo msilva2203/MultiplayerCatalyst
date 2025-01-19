@@ -156,7 +156,7 @@ APlayerSpawner* AGameModeCatalyst::FindAvailableSpawner(uint8 Team, bool bStarte
 {
 	for (auto Spawner : PlayerSpawners)
 	{
-		if (Spawner->SpawnerTeam == Team || Spawner->SpawnerTeam == 0)
+		if ((Spawner->SpawnerTeam == Team || Spawner->SpawnerTeam == 0) && Spawner->IsAvailable())
 		{
 			if (bStarterSpawner)
 			{

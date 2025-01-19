@@ -24,6 +24,14 @@ void APlayerControllerCatalyst::BeginPlay()
 	}
 }
 
+void APlayerControllerCatalyst::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+
+	OnReceivedPlayer();
+
+}
+
 void APlayerControllerCatalyst::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);

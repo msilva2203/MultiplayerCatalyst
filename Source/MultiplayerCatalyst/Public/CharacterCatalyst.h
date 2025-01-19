@@ -20,15 +20,20 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Character Catalyst")
 	void OnSetupCharacter();
 
-protected:
+public:
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	virtual void BeginPlay() override;
+	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupCharacter();
+	virtual void SetupCharacterController(AController* OldController, AController* NewController);
 	virtual void OnRep_PlayerState() override;
 
 	virtual uint8 GetTeam() override;
 
 public:	
+
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -39,5 +44,8 @@ public:
 	bool bCompletedSetup;
 
 private:
-	
+
+	//UPROPERTY(Replicated)
+	//float ControlRotationPitch;
+
 };

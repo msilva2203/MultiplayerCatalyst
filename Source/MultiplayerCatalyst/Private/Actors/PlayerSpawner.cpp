@@ -27,3 +27,16 @@ void APlayerSpawner::NativeSetupNewPawn(APlayerControllerCatalyst* Player, APawn
 	SetupNewPawn(Player, NewPawn);
 
 }
+
+void APlayerSpawner::SetupNewPawn_Implementation(APlayerControllerCatalyst* Player, APawn* NewPawn)
+{
+}
+
+void APlayerSpawner::OnPlayerSpawned_Implementation(APlayerControllerCatalyst* Player, APawn* NewPawn)
+{
+}
+
+bool APlayerSpawner::IsAvailable_Implementation()
+{
+	return true;
+}
